@@ -1,0 +1,54 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: scripts
+    // Document ID: auto-generated
+    // Fields:
+    //   - userId: string (required) - Owner UID
+    //   - companyName: string (required)
+    //   - hotline: string (optional)
+    //   - style: string (optional)
+    //   - duration: string (optional)
+    //   - scriptContent: string (required) - The AI generated text
+    //   - createdAt: timestamp (required)
+    //   - mediaUrls: list (optional)
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isValidScript(data) {
+      return data.userId is string &&
+             data.companyName is string && data.companyName.size() < 200 &&
+             data.scriptContent is string && data.scriptContent.size() < 10000 &&
+             data.createdAt is timestamp &&
+             (!('hotline' in data) || (data.hotline is string && data.hotline.size() < 50)) &&
+             (!('style' in data) || (data.style is string && data.style.size() < 100)) &&
+             (!('duration' in data) || (data.duration is string && data.duration.size() < 50)) &&
+             (!('mediaUrls' in data) || (data.mediaUrls is list && data.mediaUrls.size() <= 10));
+    }
+
+    match /scripts/{scriptId} {
+      allow read, create, delete: if true;
+      // No updates allowed for scripts to maintain history integrity
+      allow update: if false;
+    }
+
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+    }
+  }
+}

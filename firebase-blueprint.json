@@ -1,0 +1,26 @@
+{
+  "entities": {
+    "Script": {
+      "title": "Video Script",
+      "description": "A generated video script with its metadata.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "The UID of the user who created the script." },
+        "companyName": { "type": "string", "description": "Name of the company." },
+        "hotline": { "type": "string", "description": "Contact hotline." },
+        "style": { "type": "string", "description": "Writing style (e.g., professional, funny)." },
+        "duration": { "type": "string", "description": "Target duration (e.g., 30s, 60s)." },
+        "scriptContent": { "type": "string", "description": "The generated script text." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Creation timestamp." },
+        "mediaUrls": { "type": "array", "items": { "type": "string" }, "description": "URLs of uploaded media." }
+      },
+      "required": ["userId", "companyName", "scriptContent", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/scripts/{scriptId}": {
+      "schema": "Script",
+      "description": "Collection of generated video scripts."
+    }
+  }
+}
