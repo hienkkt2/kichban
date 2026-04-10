@@ -1,17 +1,24 @@
 import { GoogleGenAI } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-
 export interface ScriptParams {
   companyName: string;
   hotline: string;
   style: string;
   duration: string;
   mediaData?: { mimeType: string; data: string }[];
+  customApiKey?: string;
 }
 
 export async function generateVideoScript(params: ScriptParams) {
-  const { companyName, hotline, style, duration, mediaData } = params;
+  const { companyName, hotline, style, duration, mediaData, customApiKey } = params;
+
+  const apiKey = customApiKey || process.env.GEMINI_API_KEY;
+  
+  if (!apiKey) {
+    throw new Error("API Key is missing. Please provide an API Key in settings.");
+  }
+
+  const ai = new GoogleGenAI({ apiKey });
 
   const prompt = `
     Bạn là một chuyên gia marketing kỳ cựu trong ngành Xây dựng và Nội thất. 

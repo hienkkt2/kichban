@@ -87,6 +87,7 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [history, setHistory] = useState<ScriptHistory[]>([]);
   const [activeTab, setActiveTab] = useState('generator');
+  const [customApiKey, setCustomApiKey] = useState('');
   
   // Form state
   const [companyName, setCompanyName] = useState('');
@@ -97,6 +98,17 @@ export default function App() {
   const [generatedScript, setGeneratedScript] = useState('');
   
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // --- Load API Key ---
+  useEffect(() => {
+    const savedKey = localStorage.getItem('gemini_api_key');
+    if (savedKey) setCustomApiKey(savedKey);
+  }, []);
+
+  const saveApiKey = () => {
+    localStorage.setItem('gemini_api_key', customApiKey);
+    toast.success('Đã lưu API Key!');
+  };
 
   // --- Fetch History ---
   useEffect(() => {
@@ -172,7 +184,8 @@ export default function App() {
         hotline,
         style,
         duration,
-        mediaData
+        mediaData,
+        customApiKey
       });
 
       if (script) {
@@ -274,6 +287,25 @@ export default function App() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
               {/* Form Section */}
               <div className="lg:col-span-5 space-y-6">
+                <Card className="border-none shadow-xl shadow-slate-200/50">
+                  <CardHeader>
+                    <CardTitle className="text-xl">Cấu hình API</CardTitle>
+                    <CardDescription>Nhập Gemini API Key của bạn để bắt đầu.</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex gap-2">
+                      <Input 
+                        type="password"
+                        placeholder="Nhập Gemini API Key..." 
+                        value={customApiKey}
+                        onChange={(e) => setCustomApiKey(e.target.value)}
+                        className="bg-slate-50/50"
+                      />
+                      <Button variant="secondary" onClick={saveApiKey}>Lưu</Button>
+                    </div>
+                  </CardContent>
+                </Card>
+
                 <Card className="border-none shadow-xl shadow-slate-200/50">
                   <CardHeader>
                     <CardTitle className="text-xl">Thông tin kịch bản</CardTitle>
